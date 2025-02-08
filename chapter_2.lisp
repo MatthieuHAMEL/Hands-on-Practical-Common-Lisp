@@ -27,7 +27,7 @@
 ;;NIL
 
 ;; In a LISP file indentation is not necessary but critical for readability
-;; It is an opportunity to test the SLIME tool suite 
+;; It is an opportunity to test the SLIME tool suite. 
 (defun hello-world ()
   (format t "Hello, World!..."))
 
