@@ -55,10 +55,62 @@
   (make-cd
    (prompt-read "Title")
    (prompt-read "Artist")
-   (prompt-read "Rating")
-   (prompt-read "Ripped (y/n)")))
+   (or (parse-integer (prompt-read "Rating") :junk-allowed t) 0) ;That last param is just to avoid errors 
+   (y-or-n-p "Ripped"))) ; will be T or NIL ... 
 
 ;;(add-record (prompt-for-cd))
+
+(defun add-cds ()
+  (loop (add-record (prompt-for-cd))
+    (if (not (y-or-n-p "Another?")) (return))))
+
+(defun save-db (filename)
+  (with-open-file (out filename ; Opens a file and bind the stream to the out variable
+                       :direction :output ; parameters of the with-open-file function
+                       :if-exists :supersede)
+    (with-standard-io-syntax ; Expressions executed by (with-open-file) ; they can refer to that out variable
+      (print *db* out)))) ; That format produced by print is able to be read back by Lisp ...
+
+
+(defun load-db (filename)
+  (with-open-file (in filename) ; :direction will be input by default 
+    (with-standard-io-syntax
+      (setf *db* (read in))))) ; /!\ Warning: It empties *db*
+
+;; Querying the database 
+
+;; remove-if-not : "removing" elements satisfying a predicate (creates a new list in fact)
+(remove-if-not #'evenp '(1 2 3 4 5 6 7 8 9 10)) ; #'evenp to designate a function
+;; (2 4 6 8 10)
+
+(remove-if-not #'(lambda (x) (= 0 (mod x 2))) '(1 2 3 4 5 6 7 8 9 10)) ; With an anonymous function (lambda keyword)
+
+(remove-if-not
+ #'(lambda (cd) (equal (getf cd :artist) "Dixie Chicks")) *db*)
+
+;; Take the name of the artist as an argument (I tried this without looking at the solution) :
+(defun select-by-artist (artist)
+  (remove-if-not #'(lambda (cd) (equal (getf cd :artist) artist)) *db*))
+
+;; Generic version
+(defun select (selector-fn)
+  (remove-if-not selector-fn *db*))
+
+(defun select-by-artist-bis (artist)
+  (select #'(lambda (cd) (equal (getf cd :artist) artist))))
+
+;; We can abstract things a little more by defining that lambda as an "artist-selector":
+
+(defun artist-selector (artist)
+  #'(lambda (cd) (equal (getf cd :artist) artist)))
+
+;; E.g.
+(select (artist-selector "Dixie Chicks"))
+
+
+
+
+
 
 
 
