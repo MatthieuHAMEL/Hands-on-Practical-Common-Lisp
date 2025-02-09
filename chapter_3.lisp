@@ -107,6 +107,40 @@
 ;; E.g.
 (select (artist-selector "Dixie Chicks"))
 
+;;; Keyword parameters
+;; This is a function that takes 3 parameters 
+(defun foo (a b c) (list a b c))
+
+;; The following takes 3 parameters whose keys must be :a, :b and :c
+;; It produces a list of the corresponding values with NIL if the
+;; key is not given. So it is like taking a variable number of arguments ...
+(defun foo2 (&key a b c) (list a b c))
+
+;; I can also give a list of 2 or 3 elelements instead of those a b c params :
+(defun foo (&key a (b 20) (c 30 c-p)) (list a b c c-p))
+
+;; Here (b 20) means "default value of :b will be 20 so if you don't give it, the
+;; resulting list will still have 20 as its second element
+
+;; In (c 30 c-p), the c-p boolean parameter is a "supplied-p" parameter, boolean,
+;; and will let us know if the :c parameter was supplied or not.
+
+;; (foo :a 1 :b 2 :c 3)  ==> (1 2 3 T)
+;; (foo :c 3 :b 2 :a 1)  ==> (1 2 3 T)
+;; (foo :a 1 :c 3)       ==> (1 20 3 T)
+;; (foo)                 ==> (NIL 20 30 NIL)
+
+
+;; E.g
+(defun where (&key title artist rating (ripped nil ripped-p))
+  #'(lambda (cd)
+      (and
+       (if title    (equal (getf cd :title)  title)  t)
+       (if artist   (equal (getf cd :artist) artist) t)
+       (if rating   (equal (getf cd :rating) rating) t)
+       (if ripped-p (equal (getf cd :ripped) ripped) t))))
+
+(select (where :rating 10 :ripped nil))
 
 
 
