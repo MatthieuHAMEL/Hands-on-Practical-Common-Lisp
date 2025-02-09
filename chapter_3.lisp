@@ -41,3 +41,24 @@
 (defun dump-db-oneliner () ; knowing that db is a list of lists ... 
   (format t "~{~{~a:~10t~a~%~}~%~}" *db*))
 
+(defun prompt-read (prompt)
+  (format *query-io* "~a: " prompt)
+  (force-output *query-io*) ; Don't wait for a newline to print that 
+  (read-line *query-io*))
+
+;; Example :
+;;> (prompt-read "Title")
+;;"Title: <user prompt>"
+;; It returns the user prompt
+
+(defun prompt-for-cd ()
+  (make-cd
+   (prompt-read "Title")
+   (prompt-read "Artist")
+   (prompt-read "Rating")
+   (prompt-read "Ripped (y/n)")))
+
+;;(add-record (prompt-for-cd))
+
+
+
